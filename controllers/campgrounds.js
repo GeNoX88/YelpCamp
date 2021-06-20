@@ -71,12 +71,28 @@ module.exports.updateCampground = async (req, res) => {
     res.redirect(`/campgrounds/${campground._id}`);
 };
 
+// module.exports.deleteCampground = async (req, res) => {
+//     const { id } = req.params;
+//     await Campground.findByIdAndDelete(id);
+//     for (let image of campground.images) {
+//         await cloudinary.uploader.destroy(image.filename);
+//     }
+//     req.flash('success', 'Successfully deleted campground');
+//     res.redirect('/campgrounds');
+// };
+
 module.exports.deleteCampground = async (req, res) => {
     const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    for (let image of campground.images) {
-        await cloudinary.uploader.destroy(image.filename);
+    let campground = await Campground.findById(id);
+    try {
+            for (let image of campground.images) {
+                    await cloudinary.uploader.destroy(image.filename);
+            }
+    } catch(err) {
+            req.flash('error', 'Campground images could not be deleted, something went wrong.');
+            return res.redirect(`/campgrounds/${id}`);
     }
-    req.flash('success', 'Successfully deleted campground');
+    await campground.remove();
+    req.flash('success', 'Successfully deleted campground')
     res.redirect('/campgrounds');
-};
+}

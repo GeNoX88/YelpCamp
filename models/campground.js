@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const { campgroundSchema } = require('../schemas');
-const Review = require('./review');
-const Schema = mongoose.Schema;
+import { Schema as _Schema, model } from 'mongoose';
+import { deleteMany } from './review';
+const Schema = _Schema;
 
 // https://res.cloudinary.com/doy4tnavn/image/upload/w_100/v1623594090/YelpCamp/lb2lxarv0x4kmn8v37ph.jpg
 
@@ -52,7 +51,7 @@ CampgroundSchema.virtual('properties.popUpMarkup').get(function () {
 
 CampgroundSchema.post('findOneAndDelete', async function (doc) {
     if (doc) {
-        await Review.deleteMany({
+        await deleteMany({
             _id: {
                 $in: doc.reviews
             }
@@ -60,4 +59,4 @@ CampgroundSchema.post('findOneAndDelete', async function (doc) {
     }
 })
 
-module.exports = mongoose.model('Campground', CampgroundSchema);
+export default model('Campground', CampgroundSchema);

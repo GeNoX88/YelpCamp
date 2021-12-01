@@ -1,26 +1,24 @@
-const express = require('express');
-const router = express.Router();
-const campgrounds = require('../controllers/campgrounds');
-const catchAsync = require('../utils/catchAsync');
-const { isLoggedIn, isAuthor, validateCampground } = require('../middleware');
-const multer = require('multer');
-const { storage } = require('../cloudinary');
+import { Router } from 'express';
+const router = Router();
+import { index, createCampground, renderNewForm, showCampground, updateCampground, deleteCampground, renderEditForm } from '../controllers/campgrounds';
+import catchAsync from '../utils/catchAsync';
+import { isLoggedIn, isAuthor, validateCampground } from '../middleware';
+import multer from 'multer';
+import { storage } from '../cloudinary';
 const upload = multer({ storage });
 
-const Campground = require('../models/campground');
-
 router.route('/')
-    .get(catchAsync(campgrounds.index))
-    .post(isLoggedIn, upload.array('image'), validateCampground, catchAsync(campgrounds.createCampground))
+    .get(catchAsync(index))
+    .post(isLoggedIn, upload.array('image'), validateCampground, catchAsync(createCampground))
 
-router.get('/new', isLoggedIn, campgrounds.renderNewForm);
+router.get('/new', isLoggedIn, renderNewForm);
 
 router.route('/:id')
-    .get(catchAsync(campgrounds.showCampground))
-    .put(isLoggedIn, isAuthor, upload.array('image'), validateCampground, catchAsync(campgrounds.updateCampground))
-    .delete(isLoggedIn, isAuthor, catchAsync(campgrounds.deleteCampground))
+    .get(catchAsync(showCampground))
+    .put(isLoggedIn, isAuthor, upload.array('image'), validateCampground, catchAsync(updateCampground))
+    .delete(isLoggedIn, isAuthor, catchAsync(deleteCampground))
 
-router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(campgrounds.renderEditForm))
+router.get('/:id/edit', isLoggedIn, isAuthor, catchAsync(renderEditForm))
 
 
-module.exports = router;
+export default router;

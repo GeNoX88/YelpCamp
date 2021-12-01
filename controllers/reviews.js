@@ -1,8 +1,8 @@
-const Campground = require('../models/campground');
-const Review = require('../models/review');
+import { findById, findByIdAndUpdate } from '../models/campground';
+import Review, { findByIdAndDelete } from '../models/review';
 
-module.exports.createReview = async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
+export async function createReview(req, res) {
+    const campground = await findById(req.params.id);
     const review = new Review(req.body.review);
     review.author = req.user._id;
     campground.reviews.push(review);
@@ -10,12 +10,12 @@ module.exports.createReview = async (req, res) => {
     await campground.save();
     req.flash('success', 'Successfully create a new review!');
     res.redirect(`/campgrounds/${campground._id}`);
-};
+}
 
-module.exports.deleteReview = async (req, res) => {
+export async function deleteReview(req, res) {
     const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
+    await findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
+    await findByIdAndDelete(reviewId);
     req.flash('success', 'Successfully delete review!');
     res.redirect(`/campgrounds/${id}`);
 }

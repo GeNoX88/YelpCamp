@@ -1,9 +1,9 @@
-const { campgroundSchema, reviewSchema } = require('./schemas.js');
-const ExpressError = require('./utils/ExpressError');
-const Campground = require('./models/campground');
-const Review = require('./models/review');
+import { campgroundSchema, reviewSchema } from './schemas.js';
+import ExpressError from './utils/ExpressError';
+import Campground from './models/campground';
+import Review from './models/review';
 
-module.exports.isLoggedIn = (req, res, next) => {
+export function isLoggedIn(req, res, next) {
     if (!req.isAuthenticated()) {
         req.session.returnTo = req.originalUrl;
         req.flash('error', 'You must be signed in first')
@@ -12,7 +12,7 @@ module.exports.isLoggedIn = (req, res, next) => {
     next();
 }
 
-module.exports.validateCampground = (req, res, next) => {
+export function validateCampground(req, res, next) {
     const { error } = campgroundSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',');
@@ -22,7 +22,7 @@ module.exports.validateCampground = (req, res, next) => {
     }
 }
 
-module.exports.isAuthor = async (req, res, next) => {
+export async function isAuthor(req, res, next) {
     const { id } = req.params;
     const campground = await Campground.findById(id);
     if (!campground.author._id.equals(req.user._id)) {
@@ -32,7 +32,7 @@ module.exports.isAuthor = async (req, res, next) => {
     next();
 }
 
-module.exports.validateReview = (req, res, next) => {
+export function validateReview(req, res, next) {
     const { error } = reviewSchema.validate(req.body);
     if (error) {
         const msg = error.details.map(el => el.message).join(',');
@@ -42,7 +42,7 @@ module.exports.validateReview = (req, res, next) => {
     }
 }
 
-module.exports.isReviewAuthor = async (req, res, next) => {
+export async function isReviewAuthor(req, res, next) {
     const { id, reviewId } = req.params;
     const review = await Review.findById(reviewId);
     if (!review.author._id.equals(req.user._id)) {
